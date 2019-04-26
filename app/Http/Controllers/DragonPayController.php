@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Crazymeeks\Foundation\PaymentGateway\Dragonpay;
+use Crazymeeks\Foundation\PaymentGateway\Options\Processor;
+use App\DragonpayTransaction;
 
 class DragonPayController extends Controller
 {
+    //composer require crazymeeks/dragonpay dev-master
     public function postCheckout()
     {
+        $uid = uniqid();
+
         $parameters = [
-            'txnid'       => 'APDP-0000004',
+            'txnid'       => $uid,
             'amount'      => 1000,
             'ccy'         => 'PHP',
             'description' => 'Test',
@@ -19,52 +24,87 @@ class DragonPayController extends Controller
             'param2'      => 'http://academeportal.com',
         ];
 
-        $merchant_account = [
-            'merchantid' => 'WEBUFF',
-            'password'   => 'R21X4QiYUAB9DHW'
-        ];
+        $merchant_account = ['merchantid' => 'MERCHANT_ID', 'password' => 'MERCHANT_PASS'];
+        $testing = true; # Set Payment mode to production(false) / testing(true)
+        $dragonpay = new Dragonpay($merchant_account, $testing);
+        // $dragonpay->filterPaymentChannel( Dragonpay::OTC_NON_BANK );
 
-        $dragonpay = new Dragonpay($merchant_account);
+        // List of available payment channels
+        // Dragonpay::ONLINE_BANK
+        // Dragonpay::OTC_BANK
+        // Dragonpay::OTC_NON_BANK
+        // Dragonpay::PAYPAL
+        // Dragonpay::GCASH
+        // Dragonpay::INTL_OTC
 
         try {
-            $dragonpay->setParameters($parameters)->away();
-        } catch(PaymentException $e){
-           echo $e->getMessage(); exit;
-        } catch(\Exception $e){
-           echo $e->getMessage();
+
+            //handle postback and return url
+            $dragonpay->handlePostback(function($data){
+                DragonpayTransaction::create([
+                    'txn_id'      => $data['txnid'],
+                    'ref_no'      => $data['refno'],
+                    'merchant'    => $merchant_account['merchantid'],
+                    'amount'      => 0,
+                    'ccy'         => 'PHP',
+                    'status'      => $data['status'],
+                    'description' => $data['description']
+                ]);
+            });
+
+            $dragonpay->setParameters($parameters)
+                //force user to use bayad center
+                // ->withProcid(Processor::BAYADCENTER)
+                ->away();
+
+        } catch(PaymentException $e) {
+            echo $e->getMessage(); exit;
+        } catch(\Exception $e) {
+            echo $e->getMessage();
         }
 
     }
 
     public function transactionStatusInquiry()
     {
-        $merchant_account = [
-            'merchantid' => 'WEBUFF',
-            'password'   => 'R21X4QiYUAB9DHW'
-        ];
-
-        $txnid = 'APDP-0000001';
-        $dragonpay = new Dragonpay($merchant_account);
+        $merchant_account = ['merchantid' => 'MERCHANT_ID', 'password' => 'MERCHANT_PASS'];
+        $txnid = '5cc283a273d17';
+        $testing = true; # Set Payment mode to production(false) / testing(true)
+        $dragonpay = new Dragonpay($merchant_account, $testing);
 
         try {
-            $status = $dragonpay->action(new \Crazymeeks\Foundation\PaymentGateway\Dragonpay\Action\CheckTransactionStatus($txnid));
+            return $status = $dragonpay->action(new \Crazymeeks\Foundation\PaymentGateway\Dragonpay\Action\CheckTransactionStatus($txnid));
         } catch(PaymentException $e){
-           echo $e->getMessage(); exit;
+            echo $e->getMessage(); exit;
         } catch(\Exception $e){
-           echo $e->getMessage();
+            echo $e->getMessage();
         }
 
     }
 
     public function retrieveAllAvailablePaymentChannels()
     {
-        $merchant_account = [
-            'merchantid' => 'WEBUFF',
-            'password'   => 'R21X4QiYUAB9DHW'
-        ];
+        $merchant_account = ['merchantid' => 'MERCHANT_ID', 'password' => 'MERCHANT_PASS'];
+        $testing = true; # Set Payment mode to production(false) / testing(true)
+        $dragonpay = new Dragonpay($merchant_account, $testing);
 
-        $dragonpay = new Dragonpay($merchant_account);
         $amount = Dragonpay::ALL_PROCESSORS;
-        $processors = $dragonpay->getPaymentChannels($amount);
+        return $processors = $dragonpay->getPaymentChannels($amount);
+    }
+
+    public function cancelTransaction()
+    {
+        $merchant_account = ['merchantid' => 'MERCHANT_ID', 'password' => 'MERCHANT_PASS'];
+        $txnid = '5cc283a273d17';
+        $testing = true; # Set Payment mode to production(false) / testing(true)
+        $dragonpay = new Dragonpay($merchant_account, $testing);
+
+        try {
+            return $dragonpay->action(new \Crazymeeks\Foundation\PaymentGateway\Dragonpay\Action\CancelTransaction($txnid));
+        } catch(\Crazymeeks\Foundation\Exceptions\Action\CancelTransactionException $e){
+            // Error transaction cancellation
+            return $e->getMessage();
+        }
+
     }
 }

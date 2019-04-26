@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e5f772e1b88585b165b630171426136b",
+    "content-hash": "15fc6789b0e1b6ed13cb0c27b941a17e",
     "packages": [
         {
             "name": "crazymeeks/dragonpay",
-            "version": "v3.2.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/crazymeeks/dragonpay.git",
-                "reference": "b0c8660526aa2d9351bdd74ce989a8e0ac77310c"
+                "reference": "cf27a53762116f3f0ab7ab0c04efbd8e43ca1d14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/crazymeeks/dragonpay/zipball/b0c8660526aa2d9351bdd74ce989a8e0ac77310c",
-                "reference": "b0c8660526aa2d9351bdd74ce989a8e0ac77310c",
+                "url": "https://api.github.com/repos/crazymeeks/dragonpay/zipball/cf27a53762116f3f0ab7ab0c04efbd8e43ca1d14",
+                "reference": "cf27a53762116f3f0ab7ab0c04efbd8e43ca1d14",
                 "shasum": ""
             },
             "require-dev": {
@@ -53,7 +53,7 @@
                 "Dragonpay PHP library",
                 "Dragonpay library"
             ],
-            "time": "2019-04-06T14:55:55+00:00"
+            "time": "2019-04-06T15:37:35+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -4450,7 +4450,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "crazymeeks/dragonpay": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

@@ -14,4 +14,6 @@ Route::prefix('dragonpay')->group(function () {
     Route::get('retrieve-available-payment-channels', 'DragonPayController@retrieveAllAvailablePaymentChannels')
         ->name('dragonpay.available_payment_channels');
 
+    Route::get('cancel-transaction', 'DragonPayController@cancelTransaction')->name('dragonpay.cancel_transaction');
+
 });

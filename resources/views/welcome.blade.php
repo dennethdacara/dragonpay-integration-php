@@ -88,6 +88,7 @@
                     <a href="{{route('dragonpay.post_checkout')}}" target="_blank">Post Checkout Url</a>
                     <a href="{{route('dragonpay.transaction_status_inquiry')}}" target="_blank">Transaction Status Inquiry</a>
                     <a href="{{route('dragonpay.available_payment_channels')}}" target="_blank">Available Payment Channels</a>
+                    <a href="{{route('dragonpay.cancel_transaction')}}" target="_blank">Cancel Transaction</a>
                 </div>
             </div>
         </div>
